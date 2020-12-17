@@ -77,6 +77,20 @@ func (cc *CeleryClient) DelayKwargs(task string, args map[string]interface{}) (*
 	return cc.delay(celeryTask)
 }
 
+func (cc *CeleryClient) AsyncGet(task string) (*AsyncResult, error) {
+	ar := &AsyncResult{
+		TaskID: task,
+		backend: cc.backend,
+	}
+
+	_ ,err := ar.AsyncGet()
+	if err != nil {
+		return nil, err
+	}
+
+	return ar, nil
+}
+
 func (cc *CeleryClient) delay(task *TaskMessage) (*AsyncResult, error) {
 	defer releaseTaskMessage(task)
 	encodedMessage, err := task.Encode()
