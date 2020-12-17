@@ -130,7 +130,7 @@ type CeleryTask interface {
 type AsyncResult struct {
 	TaskID  string
 	backend CeleryBackend
-	result  *ResultMessage
+	Result  *ResultMessage
 }
 
 // Get gets actual result from backend
@@ -155,8 +155,8 @@ func (ar *AsyncResult) Get(timeout time.Duration) (interface{}, error) {
 
 // AsyncGet gets actual result from backend and returns nil if not available
 func (ar *AsyncResult) AsyncGet() (interface{}, error) {
-	if ar.result != nil {
-		return ar.result.Result, nil
+	if ar.Result != nil {
+		return ar.Result.Result, nil
 	}
 	val, err := ar.backend.GetResult(ar.TaskID)
 	if err != nil {
@@ -168,19 +168,19 @@ func (ar *AsyncResult) AsyncGet() (interface{}, error) {
 	if val.Status != "SUCCESS" {
 		return nil, fmt.Errorf("error response status %v", val)
 	}
-	ar.result = val
+	ar.Result = val
 	return val.Result, nil
 }
 
 // Ready checks if actual result is ready
 func (ar *AsyncResult) Ready() (bool, error) {
-	if ar.result != nil {
+	if ar.Result != nil {
 		return true, nil
 	}
 	val, err := ar.backend.GetResult(ar.TaskID)
 	if err != nil {
 		return false, err
 	}
-	ar.result = val
+	ar.Result = val
 	return (val != nil), nil
 }
